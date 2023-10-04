@@ -3,12 +3,10 @@ package com.deneb.unsplashapp.features.photos
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.deneb.unsplashapp.R
 import com.deneb.unsplashapp.core.exception.Failure
 import com.deneb.unsplashapp.core.extensions.failure
 import com.deneb.unsplashapp.core.extensions.observe
@@ -46,9 +44,10 @@ class PhotosFragment : BaseFragment<FragmentPhotosBinding>(FragmentPhotosBinding
         binding.photoList.layoutManager = layoutManager
         binding.photoList.adapter = photosAdapter
         photosAdapter.clickListener = { photo ->
-            val bundle = bundleOf("photo" to photo)
-            findNavController().navigate(R.id.detailPhotoFragment, bundle)
+            val action = PhotosFragmentDirections.actionPhotosFragmentToDetailPhotoFragment(photo.id)
+            findNavController().navigate(action)
         }
+
         binding.photoList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)

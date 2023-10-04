@@ -9,10 +9,19 @@
         android:id="@+id/photosFragment"
         android:name="com.deneb.unsplashapp.features.photos.PhotosFragment"
         android:label="fragment_photos"
-        tools:layout="@layout/fragment_photos" />
+        tools:layout="@layout/fragment_photos" >
+        <action
+            android:id="@+id/action_photosFragment_to_detailPhotoFragment"
+            app:destination="@id/detailPhotoFragment" />
+    </fragment>
     <fragment
         android:id="@+id/detailPhotoFragment"
         android:name="com.deneb.unsplashapp.features.photos.DetailPhotoFragment"
         android:label="fragment_detail_photo"
-        tools:layout="@layout/fragment_detail_photo" />
+        tools:layout="@layout/fragment_detail_photo">
+        <argument
+            android:name="id"
+            app:argType="string"
+            app:nullable="true"/>
+    </fragment>
 </navigation>
