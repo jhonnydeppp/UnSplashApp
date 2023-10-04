@@ -6,6 +6,7 @@ import android.view.View
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.deneb.unsplashapp.R
 import com.deneb.unsplashapp.core.exception.Failure
@@ -14,7 +15,6 @@ import com.deneb.unsplashapp.core.extensions.observe
 import com.deneb.unsplashapp.core.platform.BaseFragment
 import com.deneb.unsplashapp.databinding.FragmentPhotosBinding
 import com.deneb.unsplashapp.features.photos.model.UnsplashItemView
-import com.deneb.unsplashapp.features.photos.model.UnsplashResponseItem
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -25,6 +25,7 @@ class PhotosFragment : BaseFragment<FragmentPhotosBinding>(FragmentPhotosBinding
     lateinit var photosAdapter: PhotosAdapter
 
     private val photosViewModel: PhotosViewModel by viewModels()
+    var page = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,17 +42,33 @@ class PhotosFragment : BaseFragment<FragmentPhotosBinding>(FragmentPhotosBinding
     }
 
     private fun initializeView() {
-        binding.photoList.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+        val layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+        binding.photoList.layoutManager = layoutManager
         binding.photoList.adapter = photosAdapter
         photosAdapter.clickListener = { photo ->
             val bundle = bundleOf("photo" to photo)
             findNavController().navigate(R.id.detailPhotoFragment, bundle)
         }
+        binding.photoList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                val totalItemCount = layoutManager.itemCount
+                val lastVisibleItemPositions =
+                    layoutManager.findLastCompletelyVisibleItemPositions(null)
+                val lastVisibleItemPosition = lastVisibleItemPositions.max()
+
+                if (totalItemCount-1 == lastVisibleItemPosition) {
+                    page++
+                    loadPhotoList()
+                }
+            }
+        })
     }
 
     private fun loadPhotoList() {
         showProgress()
-        photosViewModel.loadPhotos()
+        photosViewModel.loadPhotos(page)
     }
 
     private fun renderPhotoList(photos: List<UnsplashItemView>?) {
