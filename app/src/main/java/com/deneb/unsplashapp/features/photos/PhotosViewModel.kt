@@ -17,10 +17,12 @@ class PhotosViewModel
     private val _photos: MutableLiveData<List<UnsplashItemView>> = MutableLiveData()
     val photos: LiveData<List<UnsplashItemView>> = _photos
 
-    fun loadPhotos() =
-        getPhotos(UseCase.None(), viewModelScope) {it.fold(::handleFailure, ::handlePhotoList)}
+    fun loadPhotos(page: Int = 1) =
+        getPhotos(page, viewModelScope) {it.fold(::handleFailure, ::handlePhotoList)}
 
     private fun handlePhotoList(photos: List<UnsplashItemView>) {
-        _photos.value = photos
+        if(_photos.value == null)
+            _photos.value = emptyList()
+        _photos.value = _photos.value?.plus(photos)
     }
 }
